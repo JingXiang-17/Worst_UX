@@ -323,6 +323,16 @@
         <button onclick="savePhoneAndExit()">Save & Exit</button>
     </div>
 
+    <div id="success-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:30px; border:4px solid #000; text-align:center; font-family: 'VT323', monospace;">
+            <p style="font-size: 24px;">Signup successful. Navigating to login page...</p>
+            <div style="display:flex; justify-content:center; gap:20px; margin-top: 20px;">
+                <button onclick="window.location.href='login.html'" style="padding: 10px 20px; cursor:pointer;">Yes</button>
+                <button onclick="document.getElementById('success-modal').style.display='none'" style="padding: 10px 20px; cursor:pointer;">No</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     let isTncChecked = true;
     let isBotChecked = true;
@@ -935,8 +945,7 @@
             alert ("You are a bot isit? Nonono you are not allowed to go in.");
             return;
         }
-        alert('signup successful, redirecting to login page');
-        window.location.href = 'login.html';
+        document.getElementById('success-modal').style.display = 'flex';
     });
 
     populateHobbies();
