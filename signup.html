@@ -422,16 +422,29 @@
     let calculatedAge = 0;
 
     async function startMic() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-        analyser.fftSize = 256;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        
-        // Periodically sample the volume
-        setInterval(updateVolume, 100);
+        try {
+            // Explicitly request access
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // Mobile browsers often require the AudioContext to be resumed after a user gesture
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+            
+            analyser = audioContext.createAnalyser();
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            analyser.fftSize = 256;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            // Periodically sample the volume
+            setInterval(updateVolume, 100);
+        } catch (err) {
+            // This alerts the user if they blocked the mic or if it's not supported
+            alert("Microphone access is required to detect your age. Please allow access in your browser settings.");
+            console.error("Mic error: ", err);
+        }
     }
 
     function updateVolume() {
@@ -760,6 +773,33 @@
             ctx.fillRect(x, y, gridSize, gridSize);
         }
     });
+
+    canvas.addEventListener('touchstart', (e) => {
+    painting = true;
+    e.preventDefault();
+}, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (!painting) return;
+        e.preventDefault(); 
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        let x = Math.floor((touch.clientX - rect.left) / gridSize) * gridSize;
+        let y = Math.floor((touch.clientY - rect.top) / gridSize) * gridSize;
+        
+        if (currentMode === 'eraser') {
+            ctx.clearRect(x, y, gridSize, gridSize);
+        } else {
+            ctx.fillStyle = currentColor;
+            ctx.fillRect(x, y, gridSize, gridSize);
+        }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', () => {
+        painting = false;
+        guessFlag();
+    });
+
     let flagDatabase = [];
 
     // Helper to convert hex from <input type="color"> to RGB
