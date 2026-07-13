@@ -6,7 +6,7 @@ There are 2 main ways to engage with this website. Either you download every htm
 
 | Vercel app link | Ratings (self-rated) |
 | -------------- | ----------- |
-| http://dxtrade.vercel.app | 10/10 |
+| https://dxtrade.vercel.app | 10/10 |
 
 Before we start, let me brief you the sections and pages you're expecting to go through.
 
